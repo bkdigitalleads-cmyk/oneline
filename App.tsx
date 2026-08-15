@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme, fonts } from './src/theme';
 import { AppProvider, useApp } from './src/state';
 import LockGate from './src/LockGate';
@@ -9,8 +10,11 @@ import TodayScreen from './src/screens/Today';
 import TimelineScreen from './src/screens/Timeline';
 import SettingsScreen from './src/screens/Settings';
 import PaywallModal from './src/screens/Paywall';
+import Onboarding from './src/screens/Onboarding';
 
-const PRIVACY_URL = 'https://bwk-apps.github.io/oneline/privacy';
+const ONBOARDED_KEY = 'oneline.onboarded.v1';
+
+const PRIVACY_URL = 'https://bkdigitalleads-cmyk.github.io/oneline/privacy.html';
 
 type Tab = 'today' | 'timeline' | 'settings';
 
@@ -23,11 +27,34 @@ const TABS: { key: Tab; label: string; icon: string }[] = [
 function Shell() {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
-  const { ready } = useApp();
+  const { ready, isPro, showPaywall } = useApp();
   const [tab, setTab] = useState<Tab>('today');
+  const [onboarded, setOnboarded] = useState<boolean | null>(null);
 
-  if (!ready) {
+  useEffect(() => {
+    AsyncStorage.getItem(ONBOARDED_KEY)
+      .then((v) => setOnboarded(v === '1'))
+      .catch(() => setOnboarded(true)); // fail open: never trap the user
+  }, []);
+
+  const finishOnboarding = () => {
+    setOnboarded(true);
+    AsyncStorage.setItem(ONBOARDED_KEY, '1').catch(() => {});
+    // Trial-forward paywall right after onboarding (skippable via ✕).
+    if (!isPro) showPaywall();
+  };
+
+  if (!ready || onboarded === null) {
     return <View style={{ flex: 1, backgroundColor: theme.bg }} />;
+  }
+
+  if (!onboarded) {
+    return (
+      <View style={{ flex: 1, backgroundColor: theme.bg, paddingTop: insets.top }}>
+        <Onboarding onDone={finishOnboarding} />
+        <PaywallModal privacyUrl={PRIVACY_URL} />
+      </View>
+    );
   }
 
   return (

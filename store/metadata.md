@@ -1,14 +1,20 @@
 # OneLine — App Store Metadata (ready to paste)
 
 ## App name (30 chars max)
-`OneLine: One Line a Day` (23 chars)
+`OneLine: One Line a Day Diary` (29 chars — adds "diary", validated cluster)
 
 ## Subtitle (30 chars max)
-`Tiny daily journal & memories` (29 chars)
+`Private 5 year diary & journal` (30 chars — packs "private", "5 year diary", "journal", all validated clusters)
 
-## Keywords (100 chars max, comma-separated, no spaces after commas)
-`one line a day,journal,diary,daily,micro journal,memories,gratitude,streak,private,minimal,writing`
-(98 chars)
+## Keywords (100 chars max, comma-separated; no words already in name/subtitle)
+`lock,password,memories,memory,book,sentence,daily,gratitude,streak,prompts,writing,simple,five,mood`
+(99 chars — "lock/password" from "diary app with lock" searches; "memory book" from the book brand; "sentence" from "one sentence journal app")
+
+Keyword research (Aug 2026, Google autocomplete sweep): app-intent confirmed for
+"one line a day app", "one line journal app", "one sentence journal app",
+"5 year journal app"; feature-intent for "diary with lock/password/no ads".
+"Micro journal" dropped — owned by a hardware product. Apple-side autocomplete
+pending (needs on-device check).
 
 ## Promotional text (170 chars max)
 `One honest line about today. 30 seconds a night becomes the story of your life — and next year, you'll read what you wrote today. Private, offline, yours.`
@@ -36,10 +42,10 @@ The app is free to use every day, and your last 30 days are always visible. Pro 
 Start tonight. One line. Future you is already grateful.
 
 ## Support URL
-(GitHub Pages — see launch checklist)
+https://bkdigitalleads-cmyk.github.io/oneline/
 
 ## Privacy Policy URL
-(GitHub Pages — see launch checklist)
+https://bkdigitalleads-cmyk.github.io/oneline/privacy.html
 
 ## Category
 Primary: Lifestyle · Secondary: Productivity
@@ -53,15 +59,16 @@ Free with in-app purchases
 ## In-App Purchases (create in App Store Connect)
 | Product ID | Type | Price | Notes |
 |---|---|---|---|
-| `oneline_pro_yearly` | Auto-renewing subscription | $9.99/yr | 7-day free trial |
-| `oneline_pro_monthly` | Auto-renewing subscription | $1.99/mo | — |
-| `oneline_pro_lifetime` | Non-consumable | $24.99 | one-time, anchors yearly |
+| `oneline_pro_yearly` | Auto-renewing subscription | $19.99/yr | 7-day free trial |
+| `oneline_pro_lifetime` | Non-consumable | $29.99 | one-time, anchors yearly |
 Subscription group: `OneLine Pro`. Entitlement in RevenueCat: `pro`.
 
-Pricing rationale (validated against live competitors Aug 2026): niche rivals
-(DayGram etc.) sell $1-2.99 one-time, so yearly must feel cheap ($9.99 w/ trial)
-and a lifetime tier ($24.99) captures subscription-averse buyers while making
-yearly look like the value pick.
+Pricing rationale (rev. after AppMasters/Steve Young playbook, Aug 2026):
+trial-forward onboarding paywall with "Continue" CTA, "No payment due today"
+reassurance, and per-month breakdown ($19.99/yr shown as "just $1.67/month").
+No monthly tier — cheap monthly cannibalizes annual. Lifetime $29.99 captures
+subscription-averse buyers (niche rivals sell $1-2.99 one-time) while making
+yearly look like the value pick. Revisit pricing upward with conversion data.
 
 ## App Privacy label answers
 - Purchases → Purchase History: App Functionality, linked to identity, no tracking

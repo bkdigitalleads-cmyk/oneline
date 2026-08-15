@@ -22,6 +22,7 @@ import {
   computeStreak,
 } from '../dates';
 import { promptForDay } from '../prompts';
+import { maybeRequestReview } from '../reviews';
 
 const MAX_LEN = 300;
 
@@ -72,6 +73,10 @@ export default function TodayScreen() {
     Keyboard.dismiss();
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => setJustSaved(false), 2000);
+    if (trimmed) {
+      const dates = await getAllEntryDates();
+      maybeRequestReview(computeStreak(new Set(dates), todayKey()));
+    }
   }, [day, text, bumpEntries]);
 
   useEffect(() => {

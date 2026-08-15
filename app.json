@@ -40,7 +40,11 @@
       "expo-local-authentication"
     ],
     "extra": {
-      "revenueCatApiKeyIos": ""
-    }
+      "revenueCatApiKeyIos": "",
+      "eas": {
+        "projectId": "719b95c8-e1f7-4e17-9b42-e774716e0d51"
+      }
+    },
+    "owner": "bkdeveloper123"
   }
 }

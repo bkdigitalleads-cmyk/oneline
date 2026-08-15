@@ -77,11 +77,11 @@ export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
           </Pressable>
 
           <Text style={[styles.title, { color: theme.text }]}>
-            Your life, one line at a time
+            Try OneLine Pro free for 7 days
           </Text>
           <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
-            OneLine Pro turns 30 seconds a day into a keepsake you’ll read for
-            the rest of your life.
+            Thirty seconds a night becomes a keepsake you’ll read for the rest
+            of your life. Start free — keep it only if you love it.
           </Text>
 
           <View style={styles.features}>
@@ -109,6 +109,14 @@ export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
               {packages.map((p) => {
                 const active = selected?.identifier === p.identifier;
                 const isAnnual = p.packageType === 'ANNUAL';
+                const isLifetime = p.packageType === 'LIFETIME';
+                const monthly =
+                  isAnnual && p.product.price
+                    ? `just ${(p.product.price / 12).toLocaleString(undefined, {
+                        style: 'currency',
+                        currency: p.product.currencyCode ?? 'USD',
+                      })}/month`
+                    : null;
                 return (
                   <Pressable
                     key={p.identifier}
@@ -123,18 +131,23 @@ export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
                   >
                     <View style={{ flex: 1 }}>
                       <Text style={[styles.pkgTitle, { color: theme.text }]}>
-                        {isAnnual ? 'Yearly' : p.packageType === 'MONTHLY' ? 'Monthly' : p.product.title}
+                        {isAnnual ? 'Yearly — 7 days free' : isLifetime ? 'Lifetime' : p.product.title}
                       </Text>
                       {isAnnual && (
                         <Text style={[styles.pkgBadge, { color: theme.accent }]}>
-                          Best value · 7-day free trial
+                          Best value{monthly ? ` · ${monthly}` : ''}
+                        </Text>
+                      )}
+                      {isLifetime && (
+                        <Text style={[styles.pkgBadge, { color: theme.textSecondary }]}>
+                          Pay once, yours forever
                         </Text>
                       )}
                     </View>
                     <Text style={[styles.pkgPrice, { color: theme.text }]}>
                       {p.product.priceString}
                       <Text style={{ color: theme.textSecondary, fontSize: 13 }}>
-                        {isAnnual ? '/yr' : '/mo'}
+                        {isAnnual ? '/yr' : isLifetime ? '' : '/mo'}
                       </Text>
                     </Text>
                   </Pressable>
@@ -146,8 +159,13 @@ export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
                 onPress={buy}
                 disabled={purchasing || !selected}
               />
+              {selected?.packageType === 'ANNUAL' && (
+                <Text style={[styles.noPayment, { color: theme.success }]}>
+                  ✓ No payment due today — cancel anytime
+                </Text>
+              )}
               <Text style={[styles.fine, { color: theme.textFaint }]}>
-                Auto-renews until cancelled. Cancel anytime in Settings.{' '}
+                Subscriptions auto-renew until cancelled. Cancel anytime in Settings.{' '}
                 <Text style={styles.link} onPress={() => Linking.openURL(TERMS_URL)}>
                   Terms
                 </Text>{' '}
@@ -193,6 +211,7 @@ const styles = StyleSheet.create({
   pkgBadge: { fontSize: 12, fontWeight: fonts.weight.semibold, marginTop: 2 },
   pkgPrice: { fontSize: 17, fontWeight: fonts.weight.bold },
   unavailable: { textAlign: 'center', marginVertical: 24, fontSize: 15 },
+  noPayment: { fontSize: 13, textAlign: 'center', fontWeight: fonts.weight.semibold },
   fine: { fontSize: 12, textAlign: 'center', lineHeight: 17, marginTop: 4 },
   link: { textDecorationLine: 'underline' },
 });
