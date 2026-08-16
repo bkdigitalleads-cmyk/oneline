@@ -2,6 +2,15 @@ name: Build and submit iOS
 on:
   push:
     branches: ['main']
+    paths:
+      - 'app.json'
+      - 'eas.json'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'App.tsx'
+      - 'index.ts'
+      - 'src/**'
+      - 'assets/**'
 jobs:
   build:
     type: build
