@@ -84,11 +84,11 @@ Journal entries are stored only on-device in SQLite.
 **What's New (paste into ASC):**
 A gentle update: smoother rating prompts and small refinements. One honest line a day — future you says thanks.
 
-**es-MX keywords (89/99, additional English terms, no title/subtitle/en-US repeats):**
-one,day,line,notebook,reflection,habit,keepsake,thoughts,mindful,today,anniversary,decade
+**es-MX keywords (92/99, additional English terms, no title/subtitle/en-US repeats — based on the deferred 1.1 set, keepsake removed as an en-US dupe):**
+anniversary,couples,baby,first,moments,scrapbook,reflection,mindfulness,evening,night,decade
 
-**ar-SA keywords (74/99, additional English terms, no repeats):**
-bullet,minimal,short,quick,note,logbook,history,flashback,remember,capture
+**ar-SA keywords (85/99, additional English terms, no repeats — the deferred 1.1 set verbatim):**
+secret,lock,faceid,notes,thoughts,highlights,remember,timeline,history,record,logbook
 
-Used already (do not repeat): oneline 5 year diary private journal / lock password memories memory book sentence daily gratitude streak prompts writing simple five mood.
+Used already post-1.1 retitle (do not repeat): oneline 5 year diary (title) / one line a day memory journal (subtitle) / five journaling daily private offline micro simple minimal gratitude mood book keepsake streak (en-US keywords).
 Reminder: add localizations via the VERSION page so ASC pre-fills name/subtitle/screenshots from en-US (verified clean on Odo 1.0.1 + StuffKeep 1.1.0). Watch the per-locale screenshot gotcha — OneLine hit it on 1.1.
