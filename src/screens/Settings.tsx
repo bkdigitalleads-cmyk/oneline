@@ -16,6 +16,7 @@ import { Card, SectionTitle, ProBadge } from '../components';
 import { useApp } from '../state';
 import { exportCsv, deleteAllEntries } from '../db';
 import { restorePurchases, isBillingAvailable } from '../purchases';
+import { maybeRequestReviewAfterExport } from '../reviews';
 
 const REMINDER_TIMES: { label: string; hour: number; minute: number }[] = [
   { label: 'Morning · 8:00 AM', hour: 8, minute: 0 },
@@ -65,6 +66,7 @@ export default function SettingsScreen() {
           mimeType: 'text/csv',
           dialogTitle: 'Export your journal',
         });
+        maybeRequestReviewAfterExport();
       }
     } catch (e: any) {
       Alert.alert('Export failed', e?.message ?? 'Please try again.');
