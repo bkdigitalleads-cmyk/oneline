@@ -79,3 +79,16 @@ yearly look like the value pick. Revisit pricing upward with conversion data.
 OneLine is a fully offline journal. No login or account exists. To test Pro
 features, use the sandbox purchase flow on the paywall (Settings → OneLine Pro).
 Journal entries are stored only on-device in SQLite.
+
+## 1.2.0 (Sep 2026) — cross-locale keywords + ratings engine
+**What's New (paste into ASC):**
+A gentle update: smoother rating prompts and small refinements. One honest line a day — future you says thanks.
+
+**es-MX keywords (89/99, additional English terms, no title/subtitle/en-US repeats):**
+one,day,line,notebook,reflection,habit,keepsake,thoughts,mindful,today,anniversary,decade
+
+**ar-SA keywords (74/99, additional English terms, no repeats):**
+bullet,minimal,short,quick,note,logbook,history,flashback,remember,capture
+
+Used already (do not repeat): oneline 5 year diary private journal / lock password memories memory book sentence daily gratitude streak prompts writing simple five mood.
+Reminder: add localizations via the VERSION page so ASC pre-fills name/subtitle/screenshots from en-US (verified clean on Odo 1.0.1 + StuffKeep 1.1.0). Watch the per-locale screenshot gotcha — OneLine hit it on 1.1.
