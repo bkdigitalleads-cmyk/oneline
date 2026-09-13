@@ -142,6 +142,7 @@ export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
                 const active = selected?.identifier === p.identifier;
                 const isAnnual = p.packageType === 'ANNUAL';
                 const isLifetime = p.packageType === 'LIFETIME';
+                const isWeekly = p.packageType === 'WEEKLY';
                 const monthly =
                   isAnnual && p.product.price
                     ? `just ${(p.product.price / 12).toLocaleString(undefined, {
@@ -179,7 +180,7 @@ export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
                     <Text style={[styles.pkgPrice, { color: theme.text }]}>
                       {p.product.priceString}
                       <Text style={{ color: theme.textSecondary, fontSize: 13 }}>
-                        {isAnnual ? '/yr' : isLifetime ? '' : '/mo'}
+                        {isAnnual ? '/yr' : isLifetime ? '' : isWeekly ? '/wk' : '/mo'}
                       </Text>
                     </Text>
                   </Pressable>
