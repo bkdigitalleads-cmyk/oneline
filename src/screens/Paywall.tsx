@@ -86,7 +86,12 @@ export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
     }
   };
 
-  const packages = offering?.availablePackages ?? [];
+  // Yearly is the hero: show it first, then Lifetime, then Weekly.
+  const rank = (t: string) =>
+    t === 'ANNUAL' ? 0 : t === 'LIFETIME' ? 1 : t === 'WEEKLY' ? 2 : 3;
+  const packages = [...(offering?.availablePackages ?? [])].sort(
+    (a, b) => rank(a.packageType) - rank(b.packageType),
+  );
 
   // Localized prices for the always-visible disclosure below. They are blank
   // until StoreKit answers — the disclosure still renders without them.
@@ -94,6 +99,23 @@ export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
     .priceString;
   const lifetimePrice = packages.find((p) => p.packageType === 'LIFETIME')
     ?.product.priceString;
+
+  // The weekly plan's price, length and free trial must be stated in the app
+  // too (App Review guideline 3.1.2(c)).
+  const weeklyPkg = packages.find((p) => p.packageType === 'WEEKLY');
+  const weeklyIntro = weeklyPkg?.product.introPrice;
+  const weeklyTrialText =
+    weeklyIntro && weeklyIntro.price === 0
+      ? `${weeklyIntro.periodNumberOfUnits} ${weeklyIntro.periodUnit.toLowerCase()}${
+          weeklyIntro.periodNumberOfUnits === 1 ? '' : 's'
+        } free`
+      : null;
+  const weeklyPrice = weeklyPkg?.product.priceString;
+  const weeklyDisclosure = weeklyPrice
+    ? ` Weekly ${weeklyPrice} is an auto-renewing subscription billed once per week until cancelled${
+        weeklyTrialText ? `; it starts with ${weeklyTrialText}, and you are not charged until the trial ends` : ''
+      }.`
+    : '';
 
   return (
     <Modal
@@ -164,7 +186,7 @@ export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
                   >
                     <View style={{ flex: 1 }}>
                       <Text style={[styles.pkgTitle, { color: theme.text }]}>
-                        {isAnnual ? 'Yearly — 7 days free' : isLifetime ? 'Lifetime' : p.product.title}
+                        {isAnnual ? 'Yearly — 7 days free' : isLifetime ? 'Lifetime' : isWeekly ? 'Weekly' : p.product.title}
                       </Text>
                       {isAnnual && (
                         <Text style={[styles.pkgBadge, { color: theme.accent }]}>
@@ -174,6 +196,13 @@ export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
                       {isLifetime && (
                         <Text style={[styles.pkgBadge, { color: theme.textSecondary }]}>
                           Pay once, yours forever
+                        </Text>
+                      )}
+                      {isWeekly && (
+                        <Text style={[styles.pkgBadge, { color: theme.textSecondary }]}>
+                          {weeklyTrialText
+                            ? `${weeklyTrialText}, then ${p.product.priceString}/week`
+                            : 'Billed weekly'}
                         </Text>
                       )}
                     </View>
@@ -229,7 +258,7 @@ export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
             OneLine Pro — Yearly{annualPrice ? ` ${annualPrice}` : ''} after a
             7-day free trial, an auto-renewing subscription billed once per
             year until cancelled; or Lifetime
-            {lifetimePrice ? ` ${lifetimePrice}` : ''}, a one-time purchase.
+            {lifetimePrice ? ` ${lifetimePrice}` : ''}, a one-time purchase.{weeklyDisclosure}{' '}
             Cancel anytime in your Apple ID settings.
           </Text>
           <View style={styles.legalLinks}>
