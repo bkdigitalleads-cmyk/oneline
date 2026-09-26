@@ -2,7 +2,7 @@
   "expo": {
     "name": "OneLine",
     "slug": "oneline-journal",
-    "version": "1.2.2",
+    "version": "1.2.3",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -10,7 +10,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.bwk.oneline",
-      "buildNumber": "8",
+      "buildNumber": "9",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSFaceIDUsageDescription": "OneLine uses Face ID to lock your journal so only you can read it."

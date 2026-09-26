@@ -20,11 +20,11 @@ async function askOnce(): Promise<void> {
 
 /**
  * Ask for an App Store rating exactly once, at a happy moment.
- * Trigger 1: right after saving an entry that puts the streak at 3+ days.
+ * Trigger 1: right after the first saved entry, so early users see it.
  * (Ratings weight heavily in App Store keyword ranking.)
  */
 export async function maybeRequestReview(streak: number): Promise<void> {
-  if (streak < 3) return;
+  if (streak < 1) return;
   await askOnce();
 }
 
