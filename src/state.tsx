@@ -6,8 +6,15 @@ import React, {
   useMemo,
   useState,
 } from 'react';
+import { AppState as RNAppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { initPurchases, getIsPro } from './purchases';
+import Purchases, { CustomerInfo } from 'react-native-purchases';
+import {
+  initPurchases,
+  getIsPro,
+  isBillingAvailable,
+  isProFromCustomerInfo,
+} from './purchases';
 import { scheduleDailyReminder, cancelDailyReminder } from './notifications';
 
 export interface Settings {
@@ -53,6 +60,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [entriesVersion, setEntriesVersion] = useState(0);
 
   useEffect(() => {
+    let cancelled = false;
+    const onCustomerInfo = (info: CustomerInfo) => setIsPro(isProFromCustomerInfo(info));
     (async () => {
       try {
         const raw = await AsyncStorage.getItem(SETTINGS_KEY);
@@ -63,11 +72,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       try {
         await initPurchases();
         setIsPro(await getIsPro());
+        // Picks up entitlement changes made outside the paywall (offer codes, Ask to Buy, renewals, lapses).
+        if (isBillingAvailable() && !cancelled) {
+          Purchases.addCustomerInfoUpdateListener(onCustomerInfo);
+        }
       } catch {
         setIsPro(false);
       }
       setReady(true);
     })();
+    return () => {
+      cancelled = true;
+      if (isBillingAvailable()) Purchases.removeCustomerInfoUpdateListener(onCustomerInfo);
+    };
   }, []);
 
   const updateSettings = useCallback(
@@ -96,9 +113,23 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     [settings]
   );
 
+  // Unlike getIsPro(), a failed lookup (e.g. offline) keeps the current value, so a paying user never loses Pro on resume.
   const refreshPro = useCallback(async () => {
-    setIsPro(await getIsPro());
+    if (!isBillingAvailable()) return;
+    try {
+      setIsPro(isProFromCustomerInfo(await Purchases.getCustomerInfo()));
+    } catch {
+      // keep current value
+    }
   }, []);
+
+  useEffect(() => {
+    if (!ready) return;
+    const sub = RNAppState.addEventListener('change', (state) => {
+      if (state === 'active') refreshPro();
+    });
+    return () => sub.remove();
+  }, [ready, refreshPro]);
 
   const value = useMemo<AppState>(
     () => ({

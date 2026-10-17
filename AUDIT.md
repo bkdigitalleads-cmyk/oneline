@@ -1,6 +1,6 @@
 # OneLine audit (Oct 15 2026)
 ## Findings
-1. [HIGH] Today screen keeps yesterday's date after the app resumes, so a new line is saved to (or overwrites) the previous day
+1. FIXED in 1.2.4 (commit "Fix stale Today date on resume and refresh Pro on foreground") [HIGH] Today screen keeps yesterday's date after the app resumes, so a new line is saved to (or overwrites) the previous day
    - Where: src/screens/Today.tsx:32 (day state), src/screens/Today.tsx:40-62 (load only runs on mount and entriesVersion), src/screens/Today.tsx:66-68 (save writes to the stale `day`)
    - What happens: user writes Tuesday's line at 10pm and leaves the app on the Today tab. iOS keeps it suspended. Wednesday at 9pm they tap the reminder; the app resumes without remounting, so Today still shows Tuesday's date and Tuesday's text under the "Today's line" heading. (a) If they replace that text with Wednesday's line and tap Update, `upsertEntry('…-tuesday')` overwrites Tuesday's entry: Tuesday is lost and Wednesday is never written. (b) If Tuesday had no entry, Wednesday's line is filed under Tuesday, then `bumpEntries` reloads with today's key and the line they just typed vanishes from the screen. The streak and On This Day also stay stale. Users with Face ID lock on are partly protected only because LockGate remounts the screen.
    - Fix: in Today, add an AppState 'change' listener that calls `load()` when the state becomes 'active' and `todayKey() !== day`. Also, at the top of `save`, if `todayKey() !== day`, call `load()` and return instead of writing.
@@ -10,7 +10,7 @@
    - What happens: a Pro user with the lock on types half a line, switches to Messages to check a detail, then comes back. On 'background', LockGate swaps the tree for the lock screen, which unmounts TodayScreen. After Face ID, Today remounts, `load()` runs `setText(entry?.text ?? '')`, and the typed text is gone.
    - Fix: always render `children` and draw the lock view as an absolutely positioned overlay on top (`StyleSheet.absoluteFill`) when locked, so the screens keep their state.
 
-3. [MED] Pro status is read only once at launch: there is no CustomerInfo listener and no refresh on foreground
+3. FIXED in 1.2.4 (commit "Fix stale Today date on resume and refresh Pro on foreground") [MED] Pro status is read only once at launch: there is no CustomerInfo listener and no refresh on foreground
    - Where: src/state.tsx:63-68 (single `getIsPro()`), src/state.tsx:99-101 (`refreshPro` is defined but never called anywhere)
    - What happens: any entitlement change that does not come through the in-app paywall is missed until the app is killed and relaunched, or the user taps Restore. Examples: redeeming a promo or offer code for Lifetime in the App Store app and then switching back to OneLine, an Ask to Buy approval, a purchase whose confirmation arrived after the paywall call errored, and recovery from a billing retry. In each case the user has paid but still sees the paywall and locked memories. In the other direction, a weekly trial that lapses keeps Pro for as long as the app stays resident.
    - Fix: after `initPurchases()` in state.tsx, when `isBillingAvailable()`, register `Purchases.addCustomerInfoUpdateListener(info => setIsPro(isProFromCustomerInfo(info)))`. Also call `refreshPro()` on AppState 'active'.

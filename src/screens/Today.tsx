@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  AppState,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -37,11 +38,12 @@ export default function TodayScreen() {
   const [justSaved, setJustSaved] = useState(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const load = useCallback(async () => {
+  // `draft` keeps unsaved typing when the day rolled over before Save was tapped.
+  const load = useCallback(async (draft?: string) => {
     const today = todayKey();
     setDay(today);
     const entry = await getEntry(today);
-    setText(entry?.text ?? '');
+    setText(entry?.text || draft || '');
     setSavedText(entry?.text ?? '');
 
     const dates = await getAllEntryDates();
@@ -61,10 +63,23 @@ export default function TodayScreen() {
     load();
   }, [load, entriesVersion]);
 
+  // iOS resumes a suspended app without remounting, so a new day needs a reload here.
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'active' && todayKey() !== day) load();
+    });
+    return () => sub.remove();
+  }, [day, load]);
+
   const dirty = text.trim() !== savedText.trim();
 
   const save = useCallback(async () => {
     const trimmed = text.trim();
+    if (todayKey() !== day) {
+      // Midnight passed on this screen: never write to yesterday's key.
+      await load(trimmed);
+      return;
+    }
     await upsertEntry(day, trimmed);
     setSavedText(trimmed);
     bumpEntries();
@@ -77,7 +92,7 @@ export default function TodayScreen() {
       const dates = await getAllEntryDates();
       maybeRequestReview(computeStreak(new Set(dates), todayKey()));
     }
-  }, [day, text, bumpEntries]);
+  }, [day, text, bumpEntries, load]);
 
   useEffect(() => {
     return () => {
